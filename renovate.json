@@ -2,6 +2,7 @@
   "extends": [
     "config:recommended"
   ],
+  "automerge": true,
   "customManagers": [
     {
       "customType": "regex",
