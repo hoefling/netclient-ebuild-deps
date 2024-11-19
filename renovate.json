@@ -7,7 +7,7 @@
       "customType": "regex",
       "fileMatch": ["^UPSTREAM_VERSION$"],
       "matchStrings": [
-        "(?<currentValue>.*?)\n",
+        "(?<currentValue>.*?)\n"
       ],
       "depNameTemplate": "gravitl/netclient",
       "datasourceTemplate": "github-releases"
