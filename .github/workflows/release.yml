@@ -35,5 +35,6 @@ jobs:
         draft: false
         prerelease: false
         name: netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}
+        tag_name: ${{ steps.upstream-version.outputs.upstream-version }}
         body: This is a stub
         files: netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}-deps.tar.gz
