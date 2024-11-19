@@ -3,8 +3,6 @@ on:
   push:
     branches:
     - main
-    tags:
-    - 'v**'
   pull_request:
     branches:
     - main
@@ -18,31 +16,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - id: upstream-version
+        run: |
+          echo upstream-version=$(cat UPSTREAM_VERSION) >> $GITHUB_OUTPUT
+          echo upstream-version-pep440=$(cat UPSTREAM_VERSION | cut -c2-) >> $GITHUB_OUTPUT
       - uses: robinraju/release-downloader@v1
         with:
           repository: gravitl/netclient
-          tag: v0.24.3
+          tag: ${{ steps.upstream-version.outputs.upstream-version }}
           tarBall: true
           extract: true
-      - run: mv gravitl-netclient-* netclient-src
+      - run: mv gravitl-netclient-* netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}
       - uses: actions/setup-go@v5
-      - working-directory: netclient-src
+      - working-directory: netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}
         run: go mod vendor
       # because actions/upload-artifact refuses to support anything but zips,
       # see https://github.com/actions/upload-artifact/issues/39 and others
-      - run: tar --create --auto-compress --file netclient-0.24.3-deps.tar.xz netclient-src/vendor
+      - run: tar --create --auto-compress --file netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}-deps.tar.gz netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}/vendor
       - uses: actions/upload-artifact@v4
         with:
-          name: netclient-0.24.3-deps.tar.xz
-          path: netclient-0.24.3-deps.tar.xz
+          name: netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}-deps.tar.gz
+          path: netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}-deps.tar.gz
           compression-level: 0
           if-no-files-found: error
-      # if this is a tag, create new release and upload the artifacts
-      - uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          draft: false
-          prerelease: false
-          name: netclient-0.24.3
-          body: This is a stub
-          files: netclient-0.24.3-deps.tar.xz

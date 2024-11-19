@@ -1,0 +1,30 @@
+name: Create netclient vendor tarball
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - 'UPSTREAM_VERSION'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Package
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - id: upstream-version
+      run: echo upstream-version-pep440=$(cat UPSTREAM_VERSION | cut -c2-) >> $GITHUB_OUTPUT
+    - uses: dawidd6/action-download-artifact@v6
+      with:
+        workflow: ci.yml
+        name: netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}-deps.tar.gz
+    - uses: softprops/action-gh-release@v2
+      with:
+        draft: false
+        prerelease: false
+        name: netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}
+        body: This is a stub
+        files: netclient-${{ steps.upstream-version.outputs.upstream-version-pep440 }}-deps.tar.gz
