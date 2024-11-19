@@ -46,4 +46,3 @@ jobs:
           name: netclient-0.24.3
           body: This is a stub
           files: netclient-0.24.3-deps.tar.xz
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
